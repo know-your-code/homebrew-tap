@@ -59,23 +59,32 @@ class KycLicenseDownloadStrategy < CurlDownloadStrategy
     url = device.fetch("verification_uri")
     code = device.fetch("user_code")
 
-    # Print the sign-in URL + user code BEFORE attempting to launch the
-    # browser: in CI, over SSH, on a headless box, or when
-    # `open`/`xdg-open` silently lies about success, this is the user's
-    # only path. We write directly to $stderr because brew's progress
-    # spinner repaints the last line of stdout on every tick and
-    # silently eats `puts`/`ohai` output — the user wouldn't see the
-    # code at all. Stderr isn't touched by the spinner.
+    # Print the sign-in URL + user code directly to $stderr. brew's
+    # progress spinner repaints the last line of stdout on every tick
+    # and would silently eat any `puts` / `ohai` output here. Stderr
+    # isn't touched by the spinner.
     $stderr.puts
     $stderr.puts "kyc: sign in to install"
     $stderr.puts
     $stderr.puts "    Open this URL in a browser:"
     $stderr.puts "        #{url}"
     $stderr.puts
-    $stderr.puts "    Then enter this code:"
+    $stderr.puts "    Then enter this code on that page:"
     $stderr.puts "        #{code}"
     $stderr.puts
-    open_verification_url(url)
+
+    # Interactive shells: offer to launch the browser on Enter. The
+    # user can also just open the URL themselves and ignore the
+    # prompt. Non-interactive runs (CI, piped installs) skip the
+    # prompt entirely — there's no terminal to read from and blocking
+    # on stdin would hang the install. The URL was already printed
+    # above; automation can scrape it.
+    if $stdin.tty?
+      $stderr.print "Press Enter to open the URL in your browser, or open it yourself: "
+      $stderr.flush
+      $stdin.gets
+      open_verification_url(url)
+    end
 
     deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + BOOTSTRAP_TIMEOUT_SECONDS
     interval = [device.fetch("interval", 5).to_i, 1].max
@@ -154,13 +163,8 @@ class KycLicenseDownloadStrategy < CurlDownloadStrategy
       end
     return if cmd && system(*cmd)
 
-    # Browser launch failed. Put the URL inside the opoo message so it
-    # rides the same stderr write as the warning — plain `puts` on
-    # stdout gets overwritten by brew's spinner on the next tick.
-    opoo <<~MSG.chomp
-      kyc: couldn't open a browser automatically. Copy this URL into a browser to continue:
-
-          #{url}
-    MSG
+    # Browser launch failed. The URL is already printed above so we
+    # don't repeat it — just tell the user the auto-launch didn't work.
+    opoo "Couldn't open a browser automatically — open the URL above manually."
   end
 end
