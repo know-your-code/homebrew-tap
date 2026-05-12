@@ -62,10 +62,15 @@ class KycLicenseDownloadStrategy < CurlDownloadStrategy
     # Print the sign-in URL BEFORE attempting to launch the browser:
     # in CI, over SSH, on a headless box, or when `open`/`xdg-open`
     # silently lies about success, this is the user's only path.
-    ohai "kyc: sign in to install"
-    puts "    Visit:     #{url}"
-    puts "    User code: #{code}"
-    puts
+    # Roll the URL + user code into the same ohai call so they ride
+    # the same stderr write — bare `puts` lands on stdout, where
+    # brew's progress spinner overwrites it on the next tick.
+    ohai <<~MSG.chomp
+      kyc: sign in to install
+
+          Visit:     #{url}
+          User code: #{code}
+    MSG
     open_verification_url(url)
 
     deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + BOOTSTRAP_TIMEOUT_SECONDS
