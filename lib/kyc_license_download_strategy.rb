@@ -56,21 +56,25 @@ class KycLicenseDownloadStrategy < CurlDownloadStrategy
   # Complete browser sign-in via OAuth 2.0 Device Authorization Grant.
   def bootstrap_via_device_flow
     device = post_device
-    url = device.fetch("verification_uri_complete")
+    url = device.fetch("verification_uri")
     code = device.fetch("user_code")
 
-    # Print the sign-in URL BEFORE attempting to launch the browser:
-    # in CI, over SSH, on a headless box, or when `open`/`xdg-open`
-    # silently lies about success, this is the user's only path.
-    # Roll the URL + user code into the same ohai call so they ride
-    # the same stderr write — bare `puts` lands on stdout, where
-    # brew's progress spinner overwrites it on the next tick.
-    ohai <<~MSG.chomp
-      kyc: sign in to install
-
-          Visit:     #{url}
-          User code: #{code}
-    MSG
+    # Print the sign-in URL + user code BEFORE attempting to launch the
+    # browser: in CI, over SSH, on a headless box, or when
+    # `open`/`xdg-open` silently lies about success, this is the user's
+    # only path. We write directly to $stderr because brew's progress
+    # spinner repaints the last line of stdout on every tick and
+    # silently eats `puts`/`ohai` output — the user wouldn't see the
+    # code at all. Stderr isn't touched by the spinner.
+    $stderr.puts
+    $stderr.puts "kyc: sign in to install"
+    $stderr.puts
+    $stderr.puts "    Open this URL in a browser:"
+    $stderr.puts "        #{url}"
+    $stderr.puts
+    $stderr.puts "    Then enter this code:"
+    $stderr.puts "        #{code}"
+    $stderr.puts
     open_verification_url(url)
 
     deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + BOOTSTRAP_TIMEOUT_SECONDS
