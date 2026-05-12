@@ -104,7 +104,10 @@ class KycLicenseDownloadStrategy < CurlDownloadStrategy
   end
 
   def post_token(device_code)
-    body = URI.encode_www_form(device_code: device_code)
+    body = URI.encode_www_form(
+      grant_type: "urn:ietf:params:oauth:grant-type:device_code",
+      device_code: device_code,
+    )
     resp = post_form(URI.join(INSTALL_ORIGIN, "/token"), body)
     # Some sign-in states are returned as 4xx JSON protocol responses.
     parse_json_response(resp, "POST /token", allow_4xx: true)
