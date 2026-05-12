@@ -85,8 +85,14 @@ class KycLicenseDownloadStrategy < CurlDownloadStrategy
       # Without a newline the cursor would be on the same line as the
       # prompt, and the spinner would overwrite it.
       $stderr.puts "Press Enter to open the URL in your browser (or open it yourself)."
-      $stdin.gets
-      open_verification_url(url)
+      # Don't block the poll loop on stdin. If the user opens the URL
+      # themselves and completes the flow in the browser, /token will
+      # resolve before they ever press Enter. The orphaned stdin
+      # listener dies when the process exits.
+      Thread.new do
+        $stdin.gets
+        open_verification_url(url)
+      end
     end
 
     deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + BOOTSTRAP_TIMEOUT_SECONDS
