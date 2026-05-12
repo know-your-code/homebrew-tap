@@ -80,8 +80,11 @@ class KycLicenseDownloadStrategy < CurlDownloadStrategy
     # on stdin would hang the install. The URL was already printed
     # above; automation can scrape it.
     if $stdin.tty?
-      $stderr.print "Press Enter to open the URL in your browser, or open it yourself: "
-      $stderr.flush
+      # `puts` (newline) rather than `print` (no newline): brew's
+      # progress spinner repaints the line it's sitting on every tick.
+      # Without a newline the cursor would be on the same line as the
+      # prompt, and the spinner would overwrite it.
+      $stderr.puts "Press Enter to open the URL in your browser (or open it yourself)."
       $stdin.gets
       open_verification_url(url)
     end
