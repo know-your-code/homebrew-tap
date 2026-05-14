@@ -3,7 +3,7 @@ require_relative "../lib/kyc_license_download_strategy"
 class Kyc < Formula
   desc "Code comprehension engine"
   homepage "https://github.com/know-your-code/know-your-code"
-  version "0.3.1"
+  version "0.3.2-rc1"
   license :cannot_represent
 
   # The custom strategy authenticates release downloads with the user's
@@ -13,12 +13,12 @@ class Kyc < Formula
     on_arm do
       url "https://id.knowyourco.de/release/v#{version}/aarch64-macos.tar.gz",
           using: KycLicenseDownloadStrategy
-      sha256 "45d7ff61dc58d037ea5b20a63caaa507fc146ea14e56f5542f00299162210e64"
+      sha256 "61152004a221cab0ad70a0c0f4a6e4337c506f389c0b1645528fc34ffb95a1e0"
     end
     on_intel do
       url "https://id.knowyourco.de/release/v#{version}/x86_64-macos.tar.gz",
           using: KycLicenseDownloadStrategy
-      sha256 "705832669a27bb03940a3589e4c6cf8b568d47ff9acd590d3bf6b17f71934dbe"
+      sha256 "1ba770cfcf85c2b5c989e1523295c8e1b713e538f93b0543d7a0308cf540d812"
     end
   end
 
@@ -26,7 +26,7 @@ class Kyc < Formula
     on_intel do
       url "https://id.knowyourco.de/release/v#{version}/x86_64-linux.tar.gz",
           using: KycLicenseDownloadStrategy
-      sha256 "1050587a839d87813666b87702f9570a0247ddf647c2113dbf9a644f3b5c325b"
+      sha256 "914dbae559a66a741fc1206d003513061515263216fe8aa96188f3fde4e063d5"
     end
   end
 
