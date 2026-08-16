@@ -1,5 +1,4 @@
 require "download_strategy"
-require "base64"
 require "fileutils"
 require "json"
 require "net/http"
@@ -36,7 +35,10 @@ class KycLicenseDownloadStrategy < CurlDownloadStrategy
   end
 
   def read_or_bootstrap_license
-    return Base64.strict_encode64(File.read(LICENSE_PATH)) if File.exist?(LICENSE_PATH)
+    # [x].pack("m0") == Base64.strict_encode64(x), without the require:
+    # `base64` left Ruby's default gems in 3.4, and formula evaluation runs
+    # gems-disabled, so requiring it dies with "cannot load such file".
+    return [File.read(LICENSE_PATH)].pack("m0") if File.exist?(LICENSE_PATH)
     raise self.class.bootstrap_failure if self.class.bootstrap_failure
 
     begin
@@ -50,7 +52,7 @@ class KycLicenseDownloadStrategy < CurlDownloadStrategy
     File.chmod(0o700, dir) if File.owned?(dir)
     File.write(LICENSE_PATH, license, mode: "wb")
     File.chmod(0o600, LICENSE_PATH)
-    Base64.strict_encode64(license)
+    [license].pack("m0")
   end
 
   # Complete browser sign-in via OAuth 2.0 Device Authorization Grant.
