@@ -1,11 +1,11 @@
 require_relative "../lib/kyc_license_download_strategy"
 
 # Opt-in candidate build: macOS-only, never served as the default `kyc`.
-# Install with `brew install know-your-code/tap/kyc@0.4.0-alpha.6`.
-class KycAT040Alpha6 < Formula
+# Install with `brew install know-your-code/tap/kyc@0.4.0-alpha.7`.
+class KycAT040Alpha7 < Formula
   desc "Code comprehension engine (candidate build)"
   homepage "https://github.com/know-your-code/know-your-code"
-  version "0.4.0-alpha.6"
+  version "0.4.0-alpha.7"
   license :cannot_represent
 
   # Both formulas install bin/kyc — `brew unlink kyc` before linking this.
@@ -15,12 +15,12 @@ class KycAT040Alpha6 < Formula
     on_arm do
       url "https://id.knowyourco.de/release/v#{version}/aarch64-macos.tar.gz",
           using: KycLicenseDownloadStrategy
-      sha256 "3a6b9d1c42ae85128e8de34752189b8165418c4da2e5bd1cc8ced817334dda76"
+      sha256 "f23881a46171c80e9d55d7674926cc5045d9edc1ee3835a2671ed48fbfb1a4d5"
     end
     on_intel do
       url "https://id.knowyourco.de/release/v#{version}/x86_64-macos.tar.gz",
           using: KycLicenseDownloadStrategy
-      sha256 "5ad26a20ffcdc822af53bd2017881cd073019873fd456b5027f5f23bbb7d558a"
+      sha256 "b81ca5d99b090d92969b0ae2a2d1572914216101c86d57de0073519e12771f17"
     end
   end
 

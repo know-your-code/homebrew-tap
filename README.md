@@ -53,3 +53,18 @@ which has its own GPG-based trust anchor.
 
 - [`know-your-code/know-your-code`](https://github.com/know-your-code/know-your-code) — main Rust monorepo. The release workflow there opens PRs here.
 - [`know-your-code/cloudflare-keygen-worker`](https://github.com/know-your-code/cloudflare-keygen-worker) — issues the bearer credential the strategy attaches.
+
+## Alpha 7 candidate (macOS)
+
+The versioned candidate formula replaces Alpha 6. To install:
+
+```sh
+brew update
+# If Alpha 6 is installed and linked:
+brew unlink kyc@0.4.0-alpha.6
+brew install know-your-code/tap/kyc@0.4.0-alpha.7
+kyc --version
+```
+
+This uses the existing license and installs the CLI and both language workers.
+The default `kyc` formula is unchanged.
